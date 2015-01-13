@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" Content="text/html; charset=ISO-8859-15"/>
+		<title>Radial Clock - Stage.js</title>
+		<script src="../../Dependencies/src/?need=M4Tween,Stage"></script>
+		<style type="text/css">
+			*{font-size:12px;font-weight: normal;font-family: Arial, sans-serif;padding: 0;margin: 0;color:#666;}
+			h1,h2,h3{display:inline;font-size:14px;color:#000;}
+			h2{font-size:14px;}
+			h3 a{color:#8888FF;}
+			h3 a:hover{text-decoration: none;}
+		</style>
+		<script type="text/javascript">
+			window.addEventListener("load", init, false);
+			var _stage;
+			function init()
+			{
+				_stage = new Stage(500, 300, document.body);
+
+				_stage.setLineStyle(1);
+				_stage.moveTo(50, 0);
+				_stage.lineTo(50, 100);
+
+
+
+				var t = document.getElementById('test');
+				t = t.getContext('2d');
+
+//				t.lineWidth = 1.0;
+				t.beginPath();
+				t.moveTo(50, 0);
+				t.lineTo(50, 100);
+				t.stroke();
+			}
+		</script>
+	</head>
+	<body>
+		<canvas id="test" width="500" height="300"></canvas>
+	</body>
+</html>
