@@ -12,7 +12,7 @@ window.requestAnimFrame = (function(){
 
 /**
  * @author Arnaud NICOLAS - arno06@gmail.com
- * http://code.google.com/p/anicolas/
+ * https://github.com/arno06/Stage
  * Stage.js
  */
 function StageEvent(pType, pDelta, pBubbles)
@@ -25,6 +25,12 @@ function StageEvent(pType, pDelta, pBubbles)
 Class.define(StageEvent, [Event], {
 	delta:0
 });
+
+Event.ADDED_TO_STAGE = "added_to_stage";
+Event.REMOVED_FROM_STAGE = "removed_from_stage";
+Event.ENTER_FRAME = "enter_frame";
+Event.DRAWN = 'evt_drawn';
+
 function Vector(pX, pY){this.x = pX||0; this.y = pY||0;}
 Class.define(Vector, [Class], {
 	x:0,
@@ -528,6 +534,7 @@ Class.define(Stage, [Container], {
 		this.context.clearRect(0,0,this.width, this.height);
 		this.__mouseEvents = {};
 		this.draw();
+		this.dispatchEvent(new Event(Event.DRAWN));
 		this._dispatchEvents();
 		this._lastTime = now;
 		if(this.running)

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" Content="text/html; charset=ISO-8859-15"/>
+    <title>Generator - Stage.js</title>
+    <script type="text/javascript" src="../../Dependencies/src/?need=M4Tween,Stage"></script>
+    <style type="text/css">
+        canvas{display:block;width:800px;margin:0 auto;}
+    </style>
+    <script type="text/javascript">
+        window.addEventListener("load", init, false);
+        var img_src = 'imgs/penguin.png';
+        var _stage;
+        var _h = 600, _w = 800;
+        var img;
+        var sprite;
+
+        function init()
+        {
+            _stage = new Stage(_w, _h, "#container");
+            img = new Bitmap(img_src);
+            _stage.addChild(img);
+            sprite = new Sprite();
+            sprite.x = 107;
+            sprite.y = 243;
+            _stage.addChild(sprite);
+            setTimeout(function()
+            {
+                _stage.addEventListener(StageEvent.DRAWN, handler, false);
+            }, 20);
+        }
+
+        function handler(e)
+        {
+            _stage.removeEventListener(StageEvent.DRAWN, handler, false);
+
+            var d = 128;
+
+            var x = 1, y = 1;
+
+            var step = 6;
+            var w = step>>1;
+            var h = (step * (Math.sqrt(3)/2));
+            var color;
+            var a;
+
+            while(x<d)
+            {
+                y = 1;
+                while(y<d)
+                {
+                    color = _stage.getPixel(x+w, y+(h>>1));
+                    a = color.alpha/255;
+                    sprite.beginFill("rgba("+color.r+", "+color.g+", "+color.b+", "+a+")");
+                    sprite.moveTo(x, y);
+                    sprite.lineTo(x+step, y);
+                    sprite.lineTo(x + w, y + h);
+                    sprite.lineTo(x, y);
+                    sprite.endFill();
+                    color = _stage.getPixel(x+step, y+(h>>1));
+                    a = color.alpha/255;
+                    sprite.beginFill("rgba("+color.r+", "+color.g+", "+color.b+", "+a+")");
+                    sprite.moveTo(x+step, y);
+                    sprite.lineTo(x+step + w, y + h);
+                    sprite.lineTo(x+w, y + h);
+                    sprite.lineTo(x+step, y);
+                    sprite.endFill();
+                    y += h;
+                }
+                x += step;
+            }
+            _stage.addChild(new FPS());
+
+        }
+
+    </script>
+</head>
+<body>
+<div class="content" id="container">
+
+</div>
+</body>
+</html>
