@@ -16,33 +16,40 @@ function ColorPicker(pWidth, pHeight, pParent, pDebug)
 		"style":ColorPicker.style.icon,
 		"parentNode":pParent
 	});
+	this.display = true;
+	this.icon.addEventListener('click', this._togglePickerHandler.proxy(this));
+	this.container = M4.createElement('div', {
+		"style":{"position":"relative"},
+		"parentNode":pParent
+	});
 	this.super();
-	this.parentNode = pParent;
-	this.parentNode.style.cssText = "position:relative;";
 	this.mouseEnabled = true;
 	this.backgroundColor = "rgba(255, 0, 0, 1)";
 	this.width = 0;
 	this.height = 0;
 	this.localX = 0;
 	this.localY = 0;
+	this._hideHandler = this._hidePickerHandler.proxy(this);
 	this.addEventListener(Event.ADDED_TO_STAGE, this._addedHandler.proxy(this));
 	this.addEventListener(MouseEvent.MOUSE_DOWN, this._mouseDownHandler.proxy(this));
 	this.addEventListener(MouseEvent.MOUSE_UP, this._mouseUpHandler.proxy(this));
 	this.addEventListener(MouseEvent.MOUSE_OUT, this._mouseUpHandler.proxy(this));
 	this._anoEnterFrame = this._enterFrameHandler.proxy(this);
-	var stage = new Stage(pWidth, pHeight, pParent);
+	var stage = new Stage(pWidth, pHeight, this.container);
+	stage.domElement.style.position = "absolute";
+	stage.domElement.style.left = ColorPicker.style.icon.width;
 	stage.addChild(this);
 	if(pDebug)
 		stage.addChild(new FPS());
 	this.cursor = M4.createElement("div",
 	{
 		style:ColorPicker.style.cursor,
-		"parentNode":this.parentNode
+		"parentNode":this.container
 	});
 	this.selector = M4.createElement("div",
 	{
 		"style":ColorPicker.style.selector,
-		"parentNode":this.parentNode
+		"parentNode":this.container
 	});
 	this.selector.style.left = (this.height+22)+"px";
 	this.cursor.addEventListener("mouseup", this._mouseUpHandler.proxy(this));
@@ -50,6 +57,23 @@ function ColorPicker(pWidth, pHeight, pParent, pDebug)
 
 Class.define(ColorPicker, [Sprite],
 {
+	_hidePickerHandler:function(e){
+		if(e.target === this.container || e.target===this.icon){
+			return;
+		}
+		document.removeEventListener('click', this._hideHandler);
+		this._togglePickerHandler();
+	},
+	_togglePickerHandler:function(){
+		this.display = !this.display;
+		let d = this.display?"block":"none";
+		this.cursor.style.display = d;
+		this.selector.style.display = d;
+		this.container.querySelector('canvas').style.display = d;
+		if(this.display){
+			document.addEventListener('click', this._hideHandler);
+		}
+	},
 	_addedHandler:function()
 	{
 		this.width = this.stage.width;
@@ -140,7 +164,7 @@ ColorPicker.style.icon =
 {
 	"width":"22px",
 	"height":"22px",
-	"float":"left",
+	"cursor":"pointer",
 	"background-image":"url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyBpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBXaW5kb3dzIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOkI5NDUwMzhBQURCRjExRTJCRTk0RDA1MDE1OUJFRkNCIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOkI5NDUwMzhCQURCRjExRTJCRTk0RDA1MDE1OUJFRkNCIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6Qjk0NTAzODhBREJGMTFFMkJFOTREMDUwMTU5QkVGQ0IiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6Qjk0NTAzODlBREJGMTFFMkJFOTREMDUwMTU5QkVGQ0IiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz7fE42AAAABcElEQVR42rSVsaqDMBSGk5hSULBdO/gOjrp2v+B0h/sAbd9C+xIF71P4Fs7dCx0cuiniZlu9/oEjCh28qQ3E6CHny++fcMKjKPpijG3YvO0mm6bZHI/HeE5qGIZ7gDk+2radBco5Z2DK5/OpoOiu6+7fgZ7P5xgcMAHm3QoKbFkWS9P0Vwfq+/4OHDQwR4pt29ZWi1yykxSrAFZbrVbaYOSOwI/HgxN4sVhog5FLYDCVYkDRpZTaYOQOPB4rfhc8UozH3IoJzD4A/qAV9/u9V2wYxiTI6XT6vlwu62EMuaQYzJHiqeDr9bruCk2M3R82WACG9uZhHiB1Xb8sQr0VpFgIMQmMeZSTJAnLsow5jsOCIFBxMIWOFZhHOV1FZHmeq5GKmVJcVZWgIgQl3Y2ym6oYHUo9z1MjxcCURVEI8vhwOEy+SeAvnYLtdtu/YwRTlmVp4NeWy+W/bhHkvLIOMTC5aZo/HdCZ887rTkb2J8AAMUtmWC+sZUQAAAAASUVORK5CYII=')"
 };
 ColorPicker.style.cursor =
@@ -163,4 +187,9 @@ ColorPicker.style.selector =
 	"position":"absolute",
 	"top":"-3px",
 	"pointer-events":"none"//OP
+};
+ColorPicker.style.canvas = {
+	"position":"absolute",
+	"left":"0",
+	"top":"0"
 };
